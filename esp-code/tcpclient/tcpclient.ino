@@ -3,9 +3,12 @@
 const char* ssid = "wiredliving";
 const char* password = "livingwired";
 
+// https://docs.arduino.cc/libraries/wifi/#Client%20class
 
-IPAddress server(192,168,12,1);
-IPAddress gateway; // IDK if this works but it might be easy way to get PI address
+// The server has a gateway address of 192.168.12.1
+// Use gateway instead
+// IPAddress server(192,168,12,1);
+IPAddress gateway;
 
 WiFiClient client;
 
@@ -28,18 +31,24 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   gateway = WiFi.gatewayIP();
+  Serial.print("Gateway IP Address: ");
   Serial.println(gateway);
 
   if (client.connect(gateway, 18000)) {
     Serial.println("Connected to server");
     client.println("GET_STATE");
-    
   }
 
+  String str = "";
   while (client.connected()) {
     if (client.available()) {
       char c = client.read();
-      Serial.print(c); // Need a termination character use \n and stop reading on newline
+      //Serial.print(c);
+      str += c;
+      if (c == '\n') {
+        Serial.println("Got String Back: ");
+        Serial.println(str);
+      }
     }
   }
 
@@ -48,8 +57,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  
-  
+
   //gateway = WiFi.gatewayIP(); // Again IDK if this works as intended
 
   //client.connect(gateway, 18000);
