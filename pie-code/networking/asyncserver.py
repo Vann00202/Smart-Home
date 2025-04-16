@@ -11,6 +11,7 @@ MESSAGE_TYPES = {
     "SET_OFF": "SET_OFF\n"
 }
 
+# Might need to lock this with threading.Lock()
 clients = {}
 
 
@@ -20,24 +21,12 @@ async def _handle_connection(reader, writer):
     addr = writer.get_extra_info('peername')
     print(f"New connection from {addr}")
 
-    # request_queue = asyncio.Queue()
-    # clients[addr] = (writer, request_queue)
     clients[addr] = (writer, reader)
 
     try:
         while True:
             # Maybe we send a keep alive signal periodically
             await asyncio.sleep(1)
-            # request = await request_queue.get()
-
-            # print(f"Sending request to client: {request}")
-            # writer.write(request.encode())
-            # await writer.drain()  # Wait for the data to be sent
-
-            # Wait for the client to respond
-            # data = await reader.read(100)
-            # response = data.decode()
-            # print(f"Received response from client: {response}")
 
     except asyncio.CancelledError:
         print(f"Connection from {addr} was cancelled.")
@@ -71,8 +60,16 @@ async def _send_request(addr, request):
 
 # Public methods -----------------------------------------
 
-async def send_update(addr):
+async def get_state(addr):
     return await _send_request(addr, MESSAGE_TYPES["GET_STATE"])
+
+
+async def set_on(addr):
+    return await _send_request(addr, MESSAGE_TYPES["SET_ON"])
+
+
+async def set_off(addr):
+    return await _send_request(addr, MESSAGE_TYPES["SET_OFF"])
 
 
 async def start_server():
@@ -86,21 +83,29 @@ async def start_server():
     except asyncio.CancelledError:
         server.close()
         await server.wait_closed()
+        # Only run raise if we want to handle exception later
         # raise
 
 
-async def main():
+async def test():
     server_task = asyncio.create_task(start_server())
 
     await asyncio.sleep(5)
     if len(clients) > 0:
         print("Sending Update to client...")
-        await send_update(list(clients.keys())[0])
+        result = await get_state(list(clients.keys())[0])
+        print(f"Current state: {result}")
 
     await server_task
 
 
 # Entry point
 if __name__ == "__main__":
+    # Maybe find a way to run the create_ap command on a thread as a daemon
 
-    asyncio.run(main())
+    # Create an async function that creates the server task
+    # then sends updates as needed
+    asyncio.run(test)
+
+    print("Exiting...")
+    sys.exit(0)
