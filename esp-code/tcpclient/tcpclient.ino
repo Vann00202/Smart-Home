@@ -3,6 +3,12 @@
 const char* ssid = "wiredliving";
 const char* password = "livingwired";
 
+const String GET_STR = "GET_STATE";
+const String ON_STR = "SET_ON";
+const String OFF_STR = "SET_OFF";
+
+bool current_state = false;
+
 // https://docs.arduino.cc/libraries/wifi/#Client%20class
 
 // The server has a gateway address of 192.168.12.1
@@ -14,6 +20,18 @@ WiFiClient client;
 
 void setup() {
   Serial.begin(115200);
+
+  // Pin Setup
+  pinMode(19, OUTPUT);
+  pinMode(32, OUTPUT); // common anode needs to be rewired on over to 32 from 35 or shorted to 32
+
+  pinMode(23, OUTPUT); //RED
+  pinMode(22, OUTPUT); //GREEN
+  pinMode(16, OUTPUT); //BLUE
+
+  // Set outlet off
+  digitalWrite(19, HIGH); 
+
 
   delay(5000);
 
@@ -34,32 +52,45 @@ void setup() {
   Serial.print("Gateway IP Address: ");
   Serial.println(gateway);
 
-  if (client.connect(gateway, 18000)) {
-    Serial.println("Connected to server");
-    client.println("GET_STATE");
+  while (!client.connect(gateway, 18000)) {
+    Serial.println("Connecting to server");
+    delay(1000);
   }
-
-  String str = "";
-  while (client.connected()) {
-    if (client.available()) {
-      char c = client.read();
-      //Serial.print(c);
-      str += c;
-      if (c == '\n') {
-        Serial.println("Got String Back: ");
-        Serial.println(str);
-      }
-    }
-  }
+  Serial.println("Connected to server");
 
   Serial.println("Completed Setup");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // put your main code here, to run repeatedly
+  //Serial.println(client.connected());
+  //delay(100);
 
-  //gateway = WiFi.gatewayIP(); // Again IDK if this works as intended
+  String msg_str = "";
+  while (client.connected()) {
+    if (client.available()) {
+      char c = client.read();
+      msg_str += c;
+      if (c == '\n') {
+        Serial.println("Recieved String: ");
+        Serial.println(msg_str);
+        if (msg_str.indexOf(GET_STR) >= 0) {
+          client.println(current_state); // Maybe format this message nicer
+        } else if (msg_str.equals(ON_STR)) {
+          current_state = true;
+          digitalWrite(19, LOW);
+          client.println(current_state);
+        } else if (msg_str.equals(OFF_STR)) {
+          current_state = false;
+          digitalWrite(19, HIGH);
+          client.println(current_state);
+        } else {
+          Serial.println("Invalid Request");
+        }
+        msg_str = ""; // After we hit newline and process, reset string for next message
+      }
+    }
+  }
 
-  //client.connect(gateway, 18000);
-  // client.connect(server, 18000);
+  //Serial.println("Disconnected from server");
 }
