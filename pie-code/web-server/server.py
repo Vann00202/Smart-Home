@@ -11,4 +11,4 @@ def button_pressed():
 
 
 if __name__ == '__main__':
-    app.run(host = '10.167.63.157', port = 3000)
+    app.run(host = '0.0.0.0', port = 3000)
