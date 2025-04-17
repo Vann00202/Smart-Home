@@ -1,78 +1,30 @@
 # Smart Home
 
-## Networking setup
-#### General Info
-- Raspberry Pi will serve as wireless access point for esp32 devices
-- Devices will communicate over tcp sockets
+## Required Dependencies
 
-#### Access Point
-- Install linux-wifi-hotspot on raspberry pi device
-- If only one wifi card/adaptor is used then the wifi must be turned off before creating access point
-- Command to run hotspot on single adapter no internet: `sudo create_ap --no-virt wlan0 lo <SSID> <Password>`
-- Hotspot with 2 wifi devices and set gateway IP: `sudo create_ap --no-virt -g 192.168.12.1 wlan1 wlan0 <SSID> <Password>`
-- Gateway IP is important that we know for the client programs to know the server IP when run (Arduino has a method for obtaining gateway after)
-- There is a method to create a hidden network but for demo it might not be a great idea
+There are a couple ways to install all the necessary packages. Either through a nix shell or by manually installing via the distributions package manager (likely apt)
 
-#### Firewall
-The firewall must be set on the raspberry pi server to accept connections on the agreed upon port.
-- For iptables run: `iptables -A INPUT -p tcp --dport <data-port> -j ACCEPT` where `<data-port>` is the port being used
+#### Nix Shell Method
 
-## Web Server
+This is mostly recommended for getting a reproducible testing environment. The steps are as follows:
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.4.
+1. Install the nix package manager either for the entire system or just one user:
+    - Local user: `sh <(curl -L https://nixos.org/nix/install) --no-daemon`
+    - Local user: `sh <(curl -L https://nixos.org/nix/install) --daemon`
+1. Update the channels via `nix-channel --update`
+1. Enter the build environment by running `nix-shell shell.nix`
+    - The build environment can be exited at any time by running `exit`
+1. This should install all required dependencies
+    - NOTE: You will still need to run `npm install within the webserver directory`
 
-### Development server
 
-To start a local development server, run:
+#### Manual method
 
-```bash
-ng serve
-```
+This assumes you are using apt as the package manager. The steps are as follows:
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-### Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-### Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-### Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-### Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-### Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+1. RUn `sudo apt update`
+1. Make sure we can install PPAs by running `sudo apt install software-properties-common`
+1. Add required PPA `sudo add-apt-repository ppa:lakinduakash/lwh`
+1. Run `sudo apt update` again
+1. Run sudo apt install `nodejs npm python3 python3-pip arduino linux-wifi-hotspot`
+1. Install the necessary python packages `python3 -m pip install flask flask_cors`
