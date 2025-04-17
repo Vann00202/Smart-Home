@@ -83,12 +83,14 @@ async def start_server():
     except asyncio.CancelledError:
         server.close()
         await server.wait_closed()
-        # Only run raise if we want to handle exception later
-        # raise
+        raise
 
 
 def get_connected():
     return clients.keys()
+
+
+# Testing code -----------------------------
 
 
 async def _test():

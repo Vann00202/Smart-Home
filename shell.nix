@@ -7,6 +7,10 @@ stdenv.mkDerivation rec {
         python312Full
         python312Packages.flask
         python312Packages.flask-cors
+        python312Packages.quart
+        python312Packages.quart-cors
+        python312Packages.aiohttp
+        python312Packages.aiohttp-cors
         linux-wifi-hotspot
         nodejs
         yarn
