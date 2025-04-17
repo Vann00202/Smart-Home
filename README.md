@@ -28,3 +28,4 @@ This assumes you are using apt as the package manager. The steps are as follows:
 1. Run `sudo apt update` again
 1. Run sudo apt install `nodejs npm python3 python3-pip arduino linux-wifi-hotspot`
 1. Install the necessary python packages `python3 -m pip install flask flask_cors`
+1. Make sure angular-cli is installed `npm install -g @angular/cli`
