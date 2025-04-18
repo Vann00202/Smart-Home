@@ -21,11 +21,12 @@ This is mostly recommended for getting a reproducible testing environment. The s
 #### Manual method
 
 This assumes you are using apt as the package manager. The steps are as follows:
+NOTE: This uses a PPA for installing linux-wifi-hotspot. The tool can alternatively be built from source if needed.
 
 1. RUn `sudo apt update`
 1. Make sure we can install PPAs by running `sudo apt install software-properties-common`
 1. Add required PPA `sudo add-apt-repository ppa:lakinduakash/lwh`
 1. Run `sudo apt update` again
 1. Run sudo apt install `nodejs npm python3 python3-pip arduino linux-wifi-hotspot`
-1. Install the necessary python packages `python3 -m pip install flask flask_cors`
+1. Install the necessary python packages `python3 -m pip install aiohttp aiohttp-cors`
 1. Make sure angular-cli is installed `npm install -g @angular/cli`

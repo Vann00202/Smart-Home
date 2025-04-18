@@ -14,6 +14,9 @@ async def main():
     server_task = asyncio.create_task(asyncserver.start_server())
     web_task = asyncio.create_task(webserver.start_server())
 
+    # Start multiprocessing for voice recoginition here
+    await webserver.button_event.wait()
+    print("Button was pressed")
 
     try:
         await web_task
@@ -24,8 +27,6 @@ async def main():
 
 if __name__ == "__main__":
 
-    # asyncserver.start_server()
-    # webserver.app.run(host='0.0.0.0', port=3000)
     asyncio.run(main())
 
     sys.exit(0)
