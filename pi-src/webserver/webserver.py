@@ -9,7 +9,6 @@ button_event = asyncio.Event()
 
 
 async def button_pressed(request):
-    print("button")
     button_event.set()
     # Return a JSON response
     return web.json_response({"status": "success"})

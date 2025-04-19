@@ -76,11 +76,11 @@ void loop() {
         Serial.println(msg_str);
         if (msg_str.indexOf(GET_STR) >= 0) {
           client.println(current_state); // Maybe format this message nicer
-        } else if (msg_str.equals(ON_STR)) {
+        } else if (msg_str.indexOf(ON_STR) >= 0) {
           current_state = true;
           digitalWrite(19, LOW);
           client.println(current_state);
-        } else if (msg_str.equals(OFF_STR)) {
+        } else if (msg_str.indexOf(OFF_STR) >= 0) {
           current_state = false;
           digitalWrite(19, HIGH);
           client.println(current_state);

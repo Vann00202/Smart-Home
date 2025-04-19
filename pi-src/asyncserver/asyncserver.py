@@ -86,8 +86,8 @@ async def start_server():
         raise
 
 
-def get_connected():
-    return clients.keys()
+def get_connected() -> list:
+    return list(clients.keys())
 
 
 # Testing code -----------------------------
