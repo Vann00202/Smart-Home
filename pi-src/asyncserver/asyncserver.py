@@ -8,7 +8,8 @@ PORT = 18000
 MESSAGE_TYPES = {
     "GET_STATE": "GET_STATE\n",
     "SET_ON": "SET_ON\n",
-    "SET_OFF": "SET_OFF\n"
+    "SET_OFF": "SET_OFF\n",
+    "TOGGLE": "TOGGLE\n"
 }
 
 # Might need to lock this with threading.Lock()
@@ -41,6 +42,7 @@ async def _handle_connection(reader, writer):
 
 # Sends data and returns the response
 async def _send_request(addr, request):
+    print("Setting On 2")
     if addr in clients:
         writer, reader = clients[addr]
         print(f"Sending request to client: {request}")
@@ -48,7 +50,7 @@ async def _send_request(addr, request):
         await writer.drain()  # Wait for the data to be sent
 
         # Wait for the client to respond
-        data = await reader.read(100)
+        data = await reader.readline()
         response = data.decode()
         print(f"Received response from client: {response}")
 
@@ -65,11 +67,16 @@ async def get_state(addr):
 
 
 async def set_on(addr):
+    print("Setting On")
     return await _send_request(addr, MESSAGE_TYPES["SET_ON"])
 
 
 async def set_off(addr):
     return await _send_request(addr, MESSAGE_TYPES["SET_OFF"])
+
+
+async def toggle(addr):
+    return await _send_request(addr, MESSAGE_TYPES["TOGGLE"])
 
 
 async def start_server():

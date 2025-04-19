@@ -2,6 +2,7 @@
 
 import sys
 import asyncio
+import time
 
 # Local Modules
 from asyncserver import asyncserver
@@ -11,9 +12,7 @@ from webserver import webserver
 async def monitor_event(event: asyncio.Event, func: callable):
     while True:
         await event.wait()
-        print("Button")
-        # Something on the arduino side is causing it to not respond a second time
-        await func
+        response = await func()
         event.clear()
         print("Resetting Event")
 
@@ -27,7 +26,7 @@ async def main():
     result = asyncserver.get_connected()
     addr = result[0]
 
-    event_task = asyncio.create_task(monitor_event(webserver.button_event, asyncserver.set_on(addr)))
+    event_task = asyncio.create_task(monitor_event(webserver.button_event, lambda: asyncserver.toggle(addr)))
 
     # Start multiprocessing for voice recoginition here
 

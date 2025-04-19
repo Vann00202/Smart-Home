@@ -6,8 +6,8 @@ const char* password = "livingwired";
 const String GET_STR = "GET_STATE";
 const String ON_STR = "SET_ON";
 const String OFF_STR = "SET_OFF";
+const String TOGGLE_STR = "TOGGLE";
 
-bool current_state = false;
 
 // https://docs.arduino.cc/libraries/wifi/#Client%20class
 
@@ -75,15 +75,16 @@ void loop() {
         Serial.println("Recieved String: ");
         Serial.println(msg_str);
         if (msg_str.indexOf(GET_STR) >= 0) {
-          client.println(current_state); // Maybe format this message nicer
+          client.println(!digitalRead(19));
         } else if (msg_str.indexOf(ON_STR) >= 0) {
-          current_state = true;
           digitalWrite(19, LOW);
-          client.println(current_state);
+          client.println(!digitalRead(19));
         } else if (msg_str.indexOf(OFF_STR) >= 0) {
-          current_state = false;
           digitalWrite(19, HIGH);
-          client.println(current_state);
+          client.println(!digitalRead(19));
+        } else if (msg_str.indexOf(TOGGLE_STR) >= 0) {
+          digitalWrite(19, !digitalRead(19));
+          client.println(!digitalRead(19));
         } else {
           Serial.println("Invalid Request");
         }
@@ -92,5 +93,5 @@ void loop() {
     }
   }
 
-  //Serial.println("Disconnected from server");
+  Serial.println("Disconnected from server");
 }
