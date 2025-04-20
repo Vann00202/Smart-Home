@@ -45,7 +45,7 @@ def compare(transcribed, command, threshold):
     
     return False, None, similarity
 
-def transcribe(audio_queue):
+def transcribe(audio_queue, output_queue):
     model = vosk.Model(model_name)
     commands = ["module one on", "module one off"]
     recognizer = vosk.KaldiRecognizer(model, sample_rate)
@@ -66,15 +66,20 @@ def transcribe(audio_queue):
                 print(f"Transcript: {text}")
                 found, command, score = compare(text, commands, 80)
                 if found == True:
+                    if command == "module one on":
+                        output_queue.put("SET_ON")
+                    elif command == "module one off":
+                        output_queue.put("SET_OFF")
                     print(f"Successfully found {command} with {score}")
                     # Put commmand execution here
 
 if __name__ == "__main__":
     mp.set_start_method("spawn")
     audio_queue = mp.Queue()
+    output_queue = mp.Queue()
     
     record_proc = mp.Process(target=record, args=(audio_queue,))
-    transcribe_proc = mp.Process(target=transcribe, args=(audio_queue,))
+    transcribe_proc = mp.Process(target=transcribe, args=(audio_queue,output_queue,))
 
     record_proc.start()
     transcribe_proc.start()
