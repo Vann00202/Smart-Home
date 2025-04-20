@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pyaudio = "*"
+vosk = "*"
+metaphone = "*"
+rapidfuzz = "*"
+aiohttp = "*"
+aiohttp-cors = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
