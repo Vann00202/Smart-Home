@@ -6,11 +6,13 @@ import json
 from metaphone import doublemetaphone
 from rapidfuzz import fuzz
 import multiprocessing as mp
+import asyncio
 
 model_name = "vosk-model-en-us-0.22"
 sample_rate = 16000
 chunk_size = 4000
 format = pyaudio.paInt16
+
 
 def record(audio_queue):
     audio = pyaudio.PyAudio()
@@ -27,9 +29,11 @@ def record(audio_queue):
         stream.close()
         audio.terminate()
 
+
 def metaphone(text):
     words = text.lower().split()
     return ' '.join([doublemetaphone(i)[0] for i in words])
+
 
 def compare(transcribed, command, threshold):
     transcribed_meta = metaphone(transcribed)
@@ -42,8 +46,8 @@ def compare(transcribed, command, threshold):
         if similarity >= threshold:
             return True, i, similarity
 
-    
     return False, None, similarity
+
 
 def transcribe(audio_queue, output_queue):
     model = vosk.Model(model_name)
@@ -56,7 +60,7 @@ def transcribe(audio_queue, output_queue):
     while True:
         try:
             data = audio_queue.get(timeout=1)
-        except queue.Empty:
+        except audio_queue.Empty:
             continue
 
         if recognizer.AcceptWaveform(data):
@@ -73,13 +77,14 @@ def transcribe(audio_queue, output_queue):
                     print(f"Successfully found {command} with {score}")
                     # Put commmand execution here
 
+
 if __name__ == "__main__":
     mp.set_start_method("spawn")
     audio_queue = mp.Queue()
     output_queue = mp.Queue()
-    
+
     record_proc = mp.Process(target=record, args=(audio_queue,))
-    transcribe_proc = mp.Process(target=transcribe, args=(audio_queue,output_queue,))
+    transcribe_proc = mp.Process(target=transcribe, args=(audio_queue, output_queue,))
 
     record_proc.start()
     transcribe_proc.start()

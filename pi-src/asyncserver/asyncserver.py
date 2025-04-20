@@ -13,7 +13,9 @@ MESSAGE_TYPES = {
 }
 
 # Might need to lock this with threading.Lock()
+# Could also change this to a queue and the main method dequeues clients to handle
 clients = {}
+new_clients = asyncio.Queue()
 
 
 # Private methods -----------------------------------------
@@ -23,6 +25,7 @@ async def _handle_connection(reader, writer):
     print(f"New connection from {addr}")
 
     clients[addr] = (writer, reader)
+    await new_clients.put(addr)
 
     try:
         while True:
@@ -42,7 +45,6 @@ async def _handle_connection(reader, writer):
 
 # Sends data and returns the response
 async def _send_request(addr, request):
-    print("Setting On 2")
     if addr in clients:
         writer, reader = clients[addr]
         print(f"Sending request to client: {request}")
