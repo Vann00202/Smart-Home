@@ -5,6 +5,8 @@ from metaphone import doublemetaphone
 from rapidfuzz import fuzz
 import multiprocessing as mp
 import asyncio
+import pyttsx3
+import time
 
 model_name = "vosk-model-small-en-us-0.15"
 sample_rate = 16000
@@ -61,6 +63,8 @@ def transcribe(audio_queue, output_queue):
     commands = ["module one off", "module one on", "module one toggle"]
     recognizer = vosk.KaldiRecognizer(model, sample_rate)
     recognizer.SetWords(True)
+    audio_engine = pyttsx3.init()
+    audio_engine.setProperty("rate", 15)
 
     print("Starting to transcribe...")
 
@@ -77,13 +81,22 @@ def transcribe(audio_queue, output_queue):
                 print(f"Transcript: {text}")
                 found, command, score = compare(text, commands, 80)
                 if found == True:
+                    audio_engine.stop()
                     if command == "module one on":
+                        audio_engine.say("Module one is now on")
                         output_queue.put("SET_ON")
                     elif command == "module one off":
+                        audio_engine.say("Module one is now off")
                         output_queue.put("SET_OFF")
                     elif command == "module one toggle":
+                        audio_engine.say("Module has been toggled")
                         output_queue.put("SET_ON")
+                    audio_engine.runAndWait()
+                    for i in range(7):
+                        audio_queue.get(timeout=2)
+                        time.sleep(0.1)
                     print(f"Successfully found {command} with {score}")
+
 
 if __name__ == "__main__":
     mp.set_start_method("spawn")
