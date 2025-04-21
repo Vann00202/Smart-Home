@@ -1,15 +1,17 @@
-with import <nixpkgs> {};
-stdenv.mkDerivation rec {
-    name = "SmartHomeEnv";
-    env = buildEnv { name = name; paths = buildInputs; };
-    buildInputs = [
+{ pkgs ? import <nixpkgs> {} }:
+
+pkgs.mkShell {
+    packages = with pkgs; [
         arduino-ide
-        python312Full
-        python312Packages.aiohttp
-        python312Packages.aiohttp-cors
+        python311Full
         linux-wifi-hotspot
         nodejs
         yarn
         nodePackages."@angular/cli"
+    ];
+
+    env.LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
+        pkgs.stdenv.cc.cc.lib
+        pkgs.libz
     ];
 }
