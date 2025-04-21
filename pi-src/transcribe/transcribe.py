@@ -1,14 +1,12 @@
 import pyaudio
-import wave
 import vosk
-import soundfile
 import json
 from metaphone import doublemetaphone
 from rapidfuzz import fuzz
 import multiprocessing as mp
 import asyncio
 
-model_name = "vosk-model-en-us-0.22"
+model_name = "vosk-model-small-en-us-0.15"
 sample_rate = 16000
 chunk_size = 4000
 format = pyaudio.paInt16
@@ -38,20 +36,29 @@ def metaphone(text):
 def compare(transcribed, command, threshold):
     transcribed_meta = metaphone(transcribed)
 
+    if len(transcribed.split()) < 3:
+        return False, None, 0
+
+    max_similarity = 0
+    max_command = None
+
     for i in command:
         command_meta = metaphone(i)
         similarity = fuzz.partial_ratio(transcribed_meta, command_meta)
         print(f"Current similarity is {similarity}")
+        if similarity > max_similarity:
+            max_similarity = similarity
+            max_command = i
 
-        if similarity >= threshold:
-            return True, i, similarity
+    if max_similarity >= threshold:
+        return True, max_command, max_similarity
 
-    return False, None, similarity
+    return False, None, max_similarity
 
 
 def transcribe(audio_queue, output_queue):
     model = vosk.Model(model_name)
-    commands = ["module one on", "module one off"]
+    commands = ["module one off", "module one on", "module one toggle"]
     recognizer = vosk.KaldiRecognizer(model, sample_rate)
     recognizer.SetWords(True)
 
@@ -74,9 +81,9 @@ def transcribe(audio_queue, output_queue):
                         output_queue.put("SET_ON")
                     elif command == "module one off":
                         output_queue.put("SET_OFF")
+                    elif command == "module one toggle":
+                        output_queue.put("SET_ON")
                     print(f"Successfully found {command} with {score}")
-                    # Put commmand execution here
-
 
 if __name__ == "__main__":
     mp.set_start_method("spawn")
