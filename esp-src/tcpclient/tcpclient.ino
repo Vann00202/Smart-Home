@@ -39,32 +39,58 @@ void setup() {
   WiFi.begin(ssid, password);
   Serial.println("Connecting to WiFi network...");
 
-  while(WiFi.status() != WL_CONNECTED){
-    Serial.print(".");
-    delay(100);
+  // Light Red
+  digitalWrite(32, HIGH);
+  digitalWrite(23, LOW);
+  digitalWrite(22, HIGH);
+  digitalWrite(16, HIGH);
+}
+
+void connect() {
+  if (WiFi.status() != WL_CONNECTED) {
+    while(WiFi.status() != WL_CONNECTED){
+      Serial.print(".");
+      delay(100);
+      // Light Red
+      digitalWrite(32, HIGH);
+      digitalWrite(23, LOW);
+      digitalWrite(22, HIGH);
+      digitalWrite(16, HIGH);
+      delay(100);
+      // Light Off
+      digitalWrite(32, LOW);
+      digitalWrite(23, LOW);
+      digitalWrite(22, LOW);
+      digitalWrite(16, LOW);
+    }
+
+    Serial.println("\nConnected to the WiFi network");
+    Serial.print("Local ESP32 IP: ");
+    Serial.println(WiFi.localIP());
+    // Light Blue
+    digitalWrite(32, HIGH);
+    digitalWrite(23, HIGH);
+    digitalWrite(22, HIGH);
+    digitalWrite(16, LOW);
+    gateway = WiFi.gatewayIP();
+    Serial.print("Gateway IP Address: ");
+    Serial.println(gateway);
+
+    while (!client.connect(gateway, 18000)) {
+      Serial.println("Connecting to server");
+      delay(1000);
+    }
+    Serial.println("Connected to server");
+
+    Serial.println("Completed Setup");
   }
-
-  Serial.println("\nConnected to the WiFi network");
-  Serial.print("Local ESP32 IP: ");
-  Serial.println(WiFi.localIP());
-
-  gateway = WiFi.gatewayIP();
-  Serial.print("Gateway IP Address: ");
-  Serial.println(gateway);
-
-  while (!client.connect(gateway, 18000)) {
-    Serial.println("Connecting to server");
-    delay(1000);
-  }
-  Serial.println("Connected to server");
-
-  Serial.println("Completed Setup");
 }
 
 void loop() {
   // put your main code here, to run repeatedly
   //Serial.println(client.connected());
   //delay(100);
+  connect();
 
   String msg_str = "";
   while (client.connected()) {
