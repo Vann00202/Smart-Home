@@ -25,7 +25,7 @@ void setup() {
   digitalWrite(32, HIGH); 
   digitalWrite(23, LOW);
   digitalWrite(22, LOW);
-  digitalWrite(16,LOW);
+  digitalWrite(16, LOW);
 
   // Light Red
   digitalWrite(32, HIGH);
@@ -37,20 +37,20 @@ void setup() {
   digitalWrite(32, HIGH);
   digitalWrite(23, HIGH);
   digitalWrite(22, LOW);
-  digitalWrite(16,HIGH);
+  digitalWrite(16, HIGH);
 
 
   // Light Blue
   digitalWrite(32, HIGH);
   digitalWrite(23, HIGH);
   digitalWrite(22, HIGH);
-  digitalWrite(16,LOW);
+  digitalWrite(16, LOW);
 
   // Light Off
   digitalWrite(32, LOW);
   digitalWrite(23, LOW);
   digitalWrite(22, LOW);
-  digitalWrite(16,LOW);
+  digitalWrite(16, LOW);
 
 
 
