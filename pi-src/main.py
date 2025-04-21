@@ -54,6 +54,7 @@ async def main():
     transcribe_proc.start()
 
     while True:
+        await asyncio.sleep(1)
         if not output_queue.empty():
             result = output_queue.get()
             if result == "SET_ON":
