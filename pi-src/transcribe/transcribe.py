@@ -90,7 +90,7 @@ def transcribe(audio_queue, output_queue):
                         output_queue.put("SET_OFF")
                     elif command == "module one toggle":
                         audio_engine.say("Module has been toggled")
-                        output_queue.put("SET_ON")
+                        output_queue.put("TOGGLE")
                     audio_engine.runAndWait()
                     for i in range(7):
                         audio_queue.get(timeout=2)
