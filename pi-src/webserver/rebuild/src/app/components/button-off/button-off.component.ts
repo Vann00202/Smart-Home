@@ -1,16 +1,14 @@
 import { HttpClient} from '@angular/common/http';
-import { Component, input, signal } from '@angular/core';
 import { Injectable } from '@angular/core';
-
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-primary-button',
+  selector: 'app-button-off',
   imports: [],
   template: `
     <button (click)="handleButtonClick()">
-      {{label()}}
+      OFF
     </button>
-
   `,
   styles: ``
 })
@@ -19,18 +17,11 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 
-
-@Injectable({ providedIn: 'root' })
-
-
-
-export class PrimaryButtonComponent {
-  label = input('');
+export class ButtonOFFComponent {
   constructor(private http: HttpClient) {}
   handleButtonClick(){
     console.log('Button Pressed');
-    //192.168.12.1
-    this.http.post('http://192.168.12.1:3000/button-pressed',{})
+    this.http.post('http://192.168.12.1:3000/button-pressed-off',{})
       .subscribe(response => {
         console.log(response);
       });
