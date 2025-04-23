@@ -5,6 +5,8 @@ import aiohttp_cors
 import asyncio
 
 
+status = "Undetermined"
+
 async def sse_handler(request):
     response = web.StreamResponse(
         headers={
@@ -16,11 +18,11 @@ async def sse_handler(request):
     await response.prepare(request)
 
     while True:
-        data = f"data: {datetime.now()}\n\n"
-        await response.write(data.encode('utf-8'))
+        if button_pressed is not None:
+            data = f"{status}\n\n"
+            await response.write(data.encode('utf-8'))
         await asyncio.sleep(1)
 
-    return response
 
 app1 = web.Application()
 app1.router.add_get('/sse', sse_handler)
