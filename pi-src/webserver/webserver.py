@@ -5,17 +5,19 @@ import aiohttp_cors
 import asyncio
 
 
-button_event = asyncio.Event()
+button_pressed_event = None
 
 
 async def button_pressed(request):
-    button_event.set()
+    if button_pressed_event is not None:
+        button_pressed_event.set()
     # Return a JSON response
     return web.json_response({"status": "success"})
 
 
-async def start_server():
-    button_event.clear()
+async def start_server(toggle_event: asyncio.Event):
+    button_pressed_event = toggle_event
+    button_pressed_event.clear()
 
     app = web.Application()
     cors = aiohttp_cors.setup(app)
