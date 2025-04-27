@@ -5,7 +5,12 @@ import aiohttp_cors
 import asyncio
 
 
+_button_toggle_event = None
+_button_on_event = None
+_button_off_event = None
+
 status = "Undetermined"
+
 
 async def sse_handler(request):
     response = web.StreamResponse(
@@ -18,7 +23,7 @@ async def sse_handler(request):
     await response.prepare(request)
 
     while True:
-        if button_pressed is not None:
+        if _button_toggle_event is not None:
             data = f"{status}\n\n"
             await response.write(data.encode('utf-8'))
         await asyncio.sleep(1)
@@ -29,42 +34,56 @@ app1.router.add_get('/sse', sse_handler)
 web.run_app(app1)
 
 
-
-
-
-button_event = asyncio.Event()
-
-
-async def button_pressed(request):
-    if button_pressed_event is not None:
-        button_pressed_event.set()
+async def button_toggle(request):
+    if _button_toggle_event is not None:
+        _button_toggle_event.set()
     # Return a JSON response
     return web.json_response({"status": "success"})
 
 
-async def start_server(toggle_event: asyncio.Event):
-    button_pressed_event = toggle_event
-    button_pressed_event.clear()
+async def button_on(request):
+    if _button_on_event is not None:
+        _button_on_event.set()
+    # Return a JSON response
+    return web.json_response({"status": "success"})
+
+
+async def button_off(request):
+    if _button_off_event is not None:
+        _button_off_event.set()
+    # Return a JSON response
+    return web.json_response({"status": "success"})
+
+
+async def start_server(toggle_event: asyncio.Event, on_event: asyncio.Event, off_event: asyncio.Event):
+    # Make sure this actually sets the module variables
+    _button_toggle_event = toggle_event
+    _button_on_event = on_event
+    _button_off_event = off_event
+
+    _button_toggle_event.clear()
+    _button_on_event.clear()
+    _button_off_event.clear()
 
     app = web.Application()
     cors = aiohttp_cors.setup(app)
 
     # Setup CORS for the route
-    cors.add(app.router.add_post('/button-pressed', button_pressed), {
+    cors.add(app.router.add_post('/button-pressed', button_toggle), {
         "*": aiohttp_cors.ResourceOptions(
             allow_credentials=True,
             expose_headers="*",
             allow_headers="*",
         )
     })
-    cors.add(app.router.add_post('/button-pressed-on', button_pressed), {
+    cors.add(app.router.add_post('/button-pressed-on', button_on), {
         "*": aiohttp_cors.ResourceOptions(
             allow_credentials=True,
             expose_headers="*",
             allow_headers="*",
         )
     })
-    cors.add(app.router.add_post('/button-pressed-off', button_pressed), {
+    cors.add(app.router.add_post('/button-pressed-off', button_off), {
         "*": aiohttp_cors.ResourceOptions(
             allow_credentials=True,
             expose_headers="*",
