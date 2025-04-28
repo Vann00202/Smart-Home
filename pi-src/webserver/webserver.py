@@ -23,15 +23,9 @@ async def sse_handler(request):
     await response.prepare(request)
 
     while True:
-        if _button_toggle_event is not None:
-            data = f"{status}\n\n"
-            await response.write(data.encode('utf-8'))
+        data = f"{status}\n\n"
+        await response.write(data.encode('utf-8'))
         await asyncio.sleep(1)
-
-
-app1 = web.Application()
-app1.router.add_get('/sse', sse_handler)
-web.run_app(app1)
 
 
 async def button_toggle(request):
@@ -85,6 +79,13 @@ async def start_server(toggle_event: asyncio.Event, on_event: asyncio.Event, off
         )
     })
     cors.add(app.router.add_post('/button-pressed-off', button_off), {
+        "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+        )
+    })
+    cors.add(app.router.add_get('/sse', sse_handler), {
         "*": aiohttp_cors.ResourceOptions(
             allow_credentials=True,
             expose_headers="*",
