@@ -11,23 +11,6 @@ class WebserverListener:
     _button_on_event = None
     _button_off_event = None
 
-    status = "Undetermined"
-
-    # async def sse_handler(request):
-    #     response = web.StreamResponse(
-    #         headers={
-    #             'Content-Type': 'text/event-stream',
-    #             'Cache-Control': 'no-cache',
-    #             'Connection': 'keep-alive',
-    #         }
-     #   )
-        # await response.prepare(request)
-        #
-        # while True:
-        #     data = f"{WebserverListener.status}\n\n"
-            # await response.write(data.encode('utf-8'))
-            # await asyncio.sleep(1)
-
     async def button_toggle(request):
         if _button_toggle_event is not None:
             _button_toggle_event.set()
@@ -45,6 +28,13 @@ class WebserverListener:
             _button_off_event.set()
         # Return a JSON response
         return web.json_response({"status": "success"})
+    
+    
+    async def button_status(request):
+        if _button_off_event is not None:
+            _button_off_event.set()
+        # Return a JSON response
+        return web.json_response({"status": 0})
 
     async def start_server(toggle_event: asyncio.Event, on_event: asyncio.Event, off_event: asyncio.Event):
         global _button_toggle_event, _button_on_event, _button_off_event
@@ -82,13 +72,13 @@ class WebserverListener:
                 allow_headers="*",
             )
         })
-        # cors.add(app.router.add_get('/sse', WebserverListener.sse_handler), {
-        #     "*": aiohttp_cors.ResourceOptions(
-        #         allow_credentials=True,
-        #         expose_headers="*",
-        #         allow_headers="*",
-        #     )
-        # })
+        cors.add(app.router.add_post('/button-status', WebserverListener.button_status), {
+            "*": aiohttp_cors.ResourceOptions(
+                allow_credentials=True,
+                expose_headers="*",
+                allow_headers="*",
+            )
+        })
 
         await web._run_app(app, host='0.0.0.0', port=3000)
 
