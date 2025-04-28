@@ -56,7 +56,8 @@ async def button_off(request):
 
 
 async def start_server(toggle_event: asyncio.Event, on_event: asyncio.Event, off_event: asyncio.Event):
-    # Make sure this actually sets the module variables
+    global _button_toggle_event, _button_on_event, _button_off_event
+
     _button_toggle_event = toggle_event
     _button_on_event = on_event
     _button_off_event = off_event
