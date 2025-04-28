@@ -1,0 +1,11 @@
+[Unit]
+Description="Smart home system on start-up"
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/smart-homme/smart-home.sh
+Restart=no
+
+[Install]
+WantedBy=multi-user.target

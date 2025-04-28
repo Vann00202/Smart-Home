@@ -1,0 +1,10 @@
+[Unit]
+Description="Python User Part of the Smart Home"
+After=network.target
+
+[Service]
+ExecStart=/home/smart-homme/smart-user.sh
+Restart=no
+
+[Install]
+WantedBy=default.target
