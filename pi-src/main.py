@@ -33,8 +33,8 @@ async def handle_new_connections(q: asyncio.Queue):
 
 
 async def main():
-    server_task = asyncio.create_task(asyncserver.start_server(toggle_event, on_event, off_event))
-    web_task = asyncio.create_task(webserver.start_server())
+    server_task = asyncio.create_task(asyncserver.start_server())
+    web_task = asyncio.create_task(webserver.WebserverListener.start_server(toggle_event, on_event, off_event))
 
     connection_handler_task = asyncio.create_task(handle_new_connections(asyncserver.new_clients))
 
