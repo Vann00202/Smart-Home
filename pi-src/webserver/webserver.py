@@ -11,30 +11,53 @@ class WebserverListener:
     _button_on_event = None
     _button_off_event = None
 
+    _status = 2
+
     async def button_toggle(request):
+        global _status
         if _button_toggle_event is not None:
             _button_toggle_event.set()
+            if _status == 1:
+                _status = 0
+            elif _status == 0:
+                _status = 1
+            else:
+                _status = 2
+            
         # Return a JSON response
         return web.json_response({"status": "success"})
 
     async def button_on(request):
+        global _status
         if _button_on_event is not None:
             _button_on_event.set()
+            _status = 0
         # Return a JSON response
         return web.json_response({"status": "success"})
 
     async def button_off(request):
+        global _status
         if _button_off_event is not None:
             _button_off_event.set()
+            _status = 1
         # Return a JSON response
         return web.json_response({"status": "success"})
     
     
     async def button_status(request):
-        if _button_off_event is not None:
-            _button_off_event.set()
+        global _status
+        # if _button_off_event is not None:
+        #     _button_off_event.set()
+        return web.json_response(_status)
+        if _status == 0:
+            return web.json_response({"status": "ON"})
+        elif _status == 1:
+            return web.json_response({"status": "OFF"})
+        else:
+            return web.json_response({"status": "Undetermined"})
+
         # Return a JSON response
-        return web.json_response({"status": 0})
+        # return web.json_response(_status)
 
     async def start_server(toggle_event: asyncio.Event, on_event: asyncio.Event, off_event: asyncio.Event):
         global _button_toggle_event, _button_on_event, _button_off_event

@@ -11,7 +11,7 @@ import { Injectable } from '@angular/core';
   imports: [PrimaryButtonComponent, ButtonOFFComponent, ButtonONComponent],
   template: `
   <div class="header">
-  
+
     {{title}}
     <button (click)="handleButtonClick()">
       (Click for Status)
@@ -20,7 +20,7 @@ import { Injectable } from '@angular/core';
 
   </div>
   <div class="header">
-    Light Switch: 
+    Light Switch:
     <app-button-on></app-button-on>
     <app-button-off></app-button-off>
     <app-primary-button label = 'Toggle ON/OFF'/>
@@ -38,26 +38,27 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 
-export class HeaderComponent implements OnInit{
+// export class HeaderComponent implements OnInit {
+export class HeaderComponent {
   title = 'Wired Living Lights Status: ';
   status = 'Undetermined';
 
+  // ngOnInit() {
+  //   this.http.post('http://192.168.12.1:3000/button-status', {})
+  //     .subscribe(response => {
+  //       if(response == 0){
+  //         this.status = 'ON';
+  //       } else if(response == 1){
+  //         this.status = 'OFF';
+  //       } else{
+  //         this.status = 'Undetermined';
+  //       }
+  //     });
+  // }
 
-  ngOnInit(){
-    this.http.post('http://192.168.12.1:3000/button-status',{})
-      .subscribe(response => {
-        if(response == 0){
-          this.status = 'ON';
-        }else if(response == 1){
-          this.status = 'OFF';
-        }else{
-          this.status = 'Undetermined';
-        }
-      });
-  }
   constructor(private http: HttpClient) {}
   handleButtonClick(){
-    window.location.reload();
+    // window.location.reload();
     console.log('Button status Pressed');
     //192.168.12.1
     this.http.post('http://192.168.12.1:3000/button-status',{})
@@ -71,5 +72,5 @@ export class HeaderComponent implements OnInit{
         }
       });
   }
-  
+
 }
