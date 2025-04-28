@@ -33,6 +33,9 @@ async def handle_new_connections(q: asyncio.Queue):
 
 
 async def main():
+
+    global toggle_event, on_event, off_event
+
     server_task = asyncio.create_task(asyncserver.start_server())
     web_task = asyncio.create_task(webserver.WebserverListener.start_server(toggle_event, on_event, off_event))
 
@@ -48,16 +51,17 @@ async def main():
     record_proc.start()
     transcribe_proc.start()
 
+
     while True:
         await asyncio.sleep(1)
         if not output_queue.empty():
             result = output_queue.get()
             if result == "SET_ON":
-                webserver.on_event.set()
+                on_event.set()
             elif result == "SET_OFF":
-                webserver.off_event.set()
+                off_event.set()
             elif result == "TOGGLE":
-                webserver.toggle_event.set()
+                toggle_event.set()
 
     record_proc.join()
     transcribe_proc.join()

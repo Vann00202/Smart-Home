@@ -13,20 +13,20 @@ class WebserverListener:
 
     status = "Undetermined"
 
-    async def sse_handler(request):
-        response = web.StreamResponse(
-            headers={
-                'Content-Type': 'text/event-stream',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive',
-            }
-        )
-        await response.prepare(request)
-
-        while True:
-            data = f"{WebserverListener.status}\n\n"
-            await response.write(data.encode('utf-8'))
-            await asyncio.sleep(1)
+    # async def sse_handler(request):
+    #     response = web.StreamResponse(
+    #         headers={
+    #             'Content-Type': 'text/event-stream',
+    #             'Cache-Control': 'no-cache',
+    #             'Connection': 'keep-alive',
+    #         }
+     #   )
+        # await response.prepare(request)
+        #
+        # while True:
+        #     data = f"{WebserverListener.status}\n\n"
+            # await response.write(data.encode('utf-8'))
+            # await asyncio.sleep(1)
 
     async def button_toggle(request):
         if _button_toggle_event is not None:
@@ -82,13 +82,13 @@ class WebserverListener:
                 allow_headers="*",
             )
         })
-        cors.add(app.router.add_get('/sse', WebserverListener.sse_handler), {
-            "*": aiohttp_cors.ResourceOptions(
-                allow_credentials=True,
-                expose_headers="*",
-                allow_headers="*",
-            )
-        })
+        # cors.add(app.router.add_get('/sse', WebserverListener.sse_handler), {
+        #     "*": aiohttp_cors.ResourceOptions(
+        #         allow_credentials=True,
+        #         expose_headers="*",
+        #         allow_headers="*",
+        #     )
+        # })
 
         await web._run_app(app, host='0.0.0.0', port=3000)
 

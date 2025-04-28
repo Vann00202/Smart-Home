@@ -64,7 +64,11 @@ def transcribe(audio_queue, output_queue):
     recognizer = vosk.KaldiRecognizer(model, sample_rate)
     recognizer.SetWords(True)
     audio_engine = pyttsx3.init()
-    audio_engine.setProperty("rate", 15)
+    audio_engine.setProperty("rate", 30)
+
+    audio_engine.say("Listening")
+    audio_engine.runAndWait()
+    time.sleep(0.5)
 
     print("Starting to transcribe...")
 
