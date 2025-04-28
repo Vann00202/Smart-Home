@@ -1,12 +1,10 @@
-import { Component,OnDestroy,OnInit } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { PrimaryButtonComponent } from "../primary-button/primary-button.component";
 import { ButtonONComponent } from '../button-on/button-on.component';
 import { ButtonOFFComponent } from '../button-off/button-off.component';
 import { HttpClient} from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
-import { SSEService } from '../../services/ss.service.ts.service';
-import { Subscription } from 'rxjs'
+
 
 @Component({
   selector: 'app-header',
@@ -15,6 +13,9 @@ import { Subscription } from 'rxjs'
   <div class="header">
   
     {{title}}
+    <button (click)="handleButtonClick()">
+      (Click for Status)
+    </button>
     {{status}}
 
   </div>
@@ -37,34 +38,38 @@ import { Subscription } from 'rxjs'
   providedIn: 'root'
 })
 
-export class HeaderComponent implements OnInit, OnDestroy{
+export class HeaderComponent implements OnInit{
   title = 'Wired Living Lights Status: ';
   status = 'Undetermined';
 
-  private sseSubscription: Subscription | null=null;
 
-  constructor(private sseService: SSEService) {}
-
-
-
-  ngOnInit() {
-    const sseUrl = 'http://192.168.12.1:3000/sse';
-
-    this.sseSubscription = this.sseService
-      .getServerSentEvents(sseUrl)
-      .subscribe({
-        next: (data) => {
-          this.status = data; // Update UI with new data
-        },
-        error: (err) => {
-          console.error('SSE Error:', err);
-        },
+  ngOnInit(){
+    this.http.post('http://192.168.12.1:3000/button-status',{})
+      .subscribe(response => {
+        if(response == 0){
+          this.status = 'ON';
+        }else if(response == 1){
+          this.status = 'OFF';
+        }else{
+          this.status = 'Undetermined';
+        }
       });
   }
-  ngOnDestroy() {
-    // Unsubscribe to avoid memory leaks
-    if (this.sseSubscription) {
-      this.sseSubscription.unsubscribe();
-    }
+  constructor(private http: HttpClient) {}
+  handleButtonClick(){
+    window.location.reload();
+    console.log('Button status Pressed');
+    //192.168.12.1
+    this.http.post('http://192.168.12.1:3000/button-status',{})
+      .subscribe(response => {
+        if(response == 0){
+          this.status = 'ON';
+        }else if(response == 1){
+          this.status = 'OFF';
+        }else{
+          this.status = 'Undetermined';
+        }
+      });
   }
+  
 }
